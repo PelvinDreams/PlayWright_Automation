@@ -1,0 +1,13 @@
+# Node dependencies
+node_modules/
+
+# Build output
+dist/
+
+# Playwright reports
+playwright-report/
+test-results/
+
+# OS-specific junk
+.DS_Store
+Thumbs.db
