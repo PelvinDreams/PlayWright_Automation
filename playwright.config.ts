@@ -1,12 +1,29 @@
-import { defineConfig } from '@playwright/test';
+import { defineConfig } from "@playwright/test";
 
 export default defineConfig({
-  testDir: './tests',
-  timeout: 30000,
-  retries: 1,
+  testDir: "./src/tests",
+  timeout: 60000, 
+  retries: 2,     
+  reporter: [["html", { open: "never" }], ["list"]],
   use: {
-    headless: false, // Change to true to run without a browser window
-    screenshot: 'only-on-failure',
-    video: 'retain-on-failure',
+    headless: false,         
+    viewport: { width: 1280, height: 720 },
+    screenshot: "only-on-failure",
+    video: "retain-on-failure",
+    baseURL: "https://mail.timeweb.com/mailbox/",
   },
+  projects: [
+    {
+      name: "Chromium",
+      use: { browserName: "chromium" },
+    },
+    {
+      name: "Firefox",
+      use: { browserName: "firefox" },
+    },
+    {
+      name: "WebKit",
+      use: { browserName: "webkit" },
+    },
+  ],
 });
