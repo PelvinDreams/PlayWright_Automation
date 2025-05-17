@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test";
 import { LoginPage } from "../pom/login-page";
 import { EmailSender } from "../pom/email-sender";
-import { checkForUnreadEmails, getEmailContent } from "../utils/email-helper";
+import { InboxPage } from "../pom/inbox-page"; // ✅ new POM
 
 const loginUrl = "https://mail.timeweb.com/mailbox/";
 const senderEmail = "sales@foxeld.com";
@@ -12,9 +12,7 @@ const recipientPassword = "Password@2";
 const subject = "Test Email Subject";
 const body = "This is a test email content";
 
-test("Send email from sales to support and verify receipt", async ({
-  page,
-}) => {
+test("Send email from sales to support and verify receipt", async ({ page }) => {
   // LOGIN as sender
   const senderLogin = new LoginPage(page);
   await page.goto(loginUrl);
@@ -24,7 +22,7 @@ test("Send email from sales to support and verify receipt", async ({
   const emailSender = new EmailSender(page);
   await emailSender.sendEmail(recipientEmail, subject, body);
 
-  // LOG OUT (or open new context) – You may need to implement logout if same session
+  // CLEAR session
   await page.context().clearCookies();
   await page.reload();
 
@@ -34,9 +32,9 @@ test("Send email from sales to support and verify receipt", async ({
   await recipientLogin.login(recipientEmail, recipientPassword);
 
   // VERIFY receipt
-  const hasUnread = await checkForUnreadEmails(page);
-  expect(hasUnread).toBeTruthy();
+  const inbox = new InboxPage(page);
+  expect(await inbox.hasUnreadEmails()).toBeTruthy();
 
-  const content = await getEmailContent(page);
+  const content = await inbox.readFirstUnreadEmail();
   expect(content).toContain(body);
 });

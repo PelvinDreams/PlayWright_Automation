@@ -1,15 +1,9 @@
 import { Page } from "@playwright/test";
 
-const INBOX_SELECTOR = ".inbox-list";
-const UNREAD_EMAIL_SELECTOR = ".email-item.unread";
-const EMAIL_CONTENT_SELECTOR = ".email-content";
-
 export async function checkForUnreadEmails(page: Page): Promise<boolean> {
   try {
-    await page.waitForSelector(INBOX_SELECTOR, { timeout: 10000 });
-
-    const unreadEmails = await page.$$(UNREAD_EMAIL_SELECTOR);
-    console.log(`Found ${unreadEmails.length} unread email(s).`);
+    await page.waitForSelector(".inbox-list", { timeout: 10000 });
+    const unreadEmails = await page.$$(".email-item.unread");
     return unreadEmails.length > 0;
   } catch (error) {
     console.error("Error checking for unread emails:", error);
@@ -19,18 +13,16 @@ export async function checkForUnreadEmails(page: Page): Promise<boolean> {
 
 export async function getEmailContent(page: Page): Promise<string> {
   try {
-    const firstUnreadEmail = await page.$(UNREAD_EMAIL_SELECTOR);
+    const firstUnreadEmail = await page.$(".email-item.unread");
     if (!firstUnreadEmail) {
       console.log("No unread emails found.");
       return "";
     }
 
-    await firstUnreadEmail.scrollIntoViewIfNeeded();
     await firstUnreadEmail.click();
+    await page.waitForSelector(".email-content", { timeout: 10000 });
 
-    await page.waitForSelector(EMAIL_CONTENT_SELECTOR, { timeout: 10000 });
-
-    const emailContent = await page.textContent(EMAIL_CONTENT_SELECTOR);
+    const emailContent = await page.textContent(".email-content");
     return emailContent ? emailContent.trim() : "";
   } catch (error) {
     console.error("Error fetching email content:", error);
