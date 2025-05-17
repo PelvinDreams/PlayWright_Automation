@@ -8,7 +8,7 @@ export class EmailSender {
   private subjectInput = 'input[name="subject"]';
   private bodyTextarea = 'textarea[name="body"]';
   private sendButton = 'button:has-text("Send")';
-  private confirmationText = "text=Message sent"; // Adjust based on actual UI
+  private confirmationText = "text=Message sent"; 
 
   constructor(page: Page) {
     this.page = page;

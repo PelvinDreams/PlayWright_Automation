@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test";
 import { LoginPage } from "../pom/login-page";
 import { EmailSender } from "../pom/email-sender";
-import { InboxPage } from "../pom/inbox-page"; // ✅ new POM
+import { InboxPage } from "../pom/inbox-page"; 
 
 const loginUrl = "https://mail.timeweb.com/mailbox/";
 const senderEmail = "sales@foxeld.com";

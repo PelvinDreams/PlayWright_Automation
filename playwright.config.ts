@@ -11,6 +11,7 @@ export default defineConfig({
     screenshot: "only-on-failure",
     video: "retain-on-failure",
     baseURL: "https://mail.timeweb.com/mailbox/",
+    slowMo: 1000, 
   },
   projects: [
     {
