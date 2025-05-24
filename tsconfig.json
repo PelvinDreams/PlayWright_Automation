@@ -7,7 +7,12 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "outDir": "./dist",
-    "rootDir": "./src"
+    "rootDir": "./src",
+    "baseUrl": "./src",                      // ✅ Required
+    "paths": {
+      "@pom/*": ["pom/*"],                   // ✅ Add this
+      "@utils/*": ["utils/*"]
+    }
   },
   "include": ["src/**/*.ts"],
   "exclude": ["node_modules"]

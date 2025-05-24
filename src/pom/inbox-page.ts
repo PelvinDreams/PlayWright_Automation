@@ -1,27 +1,29 @@
 import { Page } from "@playwright/test";
 
-export class InboxPage {
+export class SalesMailbox {
   constructor(private readonly page: Page) {}
 
-  private readonly inboxSelector = ".inbox-list";
-  private readonly unreadEmailSelector = ".email-item.unread";
-  private readonly emailContentSelector = ".email-content";
-
-  async hasUnreadEmails(): Promise<boolean> {
-    await this.page.waitForSelector(this.inboxSelector, { timeout: 10000 });
-    const unreadEmails = await this.page.$$(this.unreadEmailSelector);
-    return unreadEmails.length > 0;
+  async goto() {
+    await this.page.goto("https://mail.timeweb.com/mailbox/");
   }
 
-  async readFirstUnreadEmail(): Promise<string> {
-    const firstUnreadEmail = await this.page.$(this.unreadEmailSelector);
-    if (!firstUnreadEmail) throw new Error("No unread emails found.");
+  async login(email: string, password: string) {
+    await this.page.getByPlaceholder("E-mail").fill(email);
+    await this.page.getByPlaceholder("Password").fill(password);
+    await this.page.getByRole("button", { name: "Login" }).click();
+    await this.page.waitForURL("**/mailbox/");
+  }
 
-    await firstUnreadEmail.scrollIntoViewIfNeeded();
-    await firstUnreadEmail.click();
+  async getLatestEmailContent(): Promise<string> {
+    // Wait for inbox to load
+    await this.page.waitForSelector('[data-testid="message-subject"]', { timeout: 15000 });
 
-    await this.page.waitForSelector(this.emailContentSelector, { timeout: 10000 });
-    const content = await this.page.textContent(this.emailContentSelector);
-    return content?.trim() ?? "";
+    // Open latest email
+    await this.page.locator('[data-testid="message-subject"]').first().click();
+
+    // Wait for email body and return its text
+    const bodyLocator = this.page.locator('[data-testid="message-body"], [contenteditable="true"]');
+    await bodyLocator.waitFor({ timeout: 10000 });
+    return bodyLocator.textContent();
   }
 }

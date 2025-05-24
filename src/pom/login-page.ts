@@ -1,45 +1,33 @@
-import { Page } from "@playwright/test";
+import { Page } from "@playwright/test"
 
 export class LoginPage {
-  private page: Page;
+  constructor(private readonly page: Page) {}
 
-  s
-  private welcomeButton = 'button:has-text("Вход в Timeweb Mail")'; 
-  private emailInput = 'input[name="login"]';
-  private passwordInput = 'input[name="password"]';
-  private loginButton = 'button[type="submit"]';
-  private inboxSelector = 'div[class*="inbox"]';  
+  private readonly emailInput = 'input[formcontrolname="login"]'
+  private readonly passwordInput = 'input[formcontrolname="password"]'
+  private readonly loginButton = 'button[type="submit"]'
+  private readonly inboxSelector = 'div[class*="letters-list__container"]'
 
-  constructor(page: Page) {
-    this.page = page;
-  }
+  async login(email: string, password: string): Promise<void> {
+    await this.page.waitForLoadState('load')
 
-  async navigate() {
-    await this.page.goto("https://mail.timeweb.com/mailbox/");
-  }
+    // Fill in email
+    const emailField = this.page.locator(this.emailInput)
+    await emailField.waitFor({ state: 'visible', timeout: 15000 })
+    await emailField.fill(email)
 
-  async login(email: string, password: string) {
-    console.log(`Logging in with email: ${email}`);
+    // Fill in password
+    const passwordField = this.page.locator(this.passwordInput)
+    await passwordField.waitFor({ state: 'visible', timeout: 15000 })
+    await passwordField.fill(password)
 
+    // Click login button
+    await this.page.locator(this.loginButton).click()
 
-    const welcomeVisible = await this.page.isVisible(this.welcomeButton);
-    if (welcomeVisible) {
-      await this.page.click(this.welcomeButton);
-    }
-
-    
-    await this.page.waitForSelector(this.emailInput, { timeout: 15000 });
-    await this.page.fill(this.emailInput, email);
-
-    
-    await this.page.waitForSelector(this.passwordInput, { timeout: 10000 });
-    await this.page.fill(this.passwordInput, password);
-
-
-    await this.page.waitForSelector(this.loginButton, { timeout: 10000 });
-    await this.page.click(this.loginButton);
-
-   
-    await this.page.waitForSelector(this.inboxSelector, { timeout: 15000 });
+    // Wait for either URL change or inbox visibility
+    await Promise.race([
+      this.page.waitForURL(/\/mailbox\/$/, { timeout: 15000 }),
+      this.page.locator(this.inboxSelector).waitFor({ state: 'visible', timeout: 15000 }),
+    ])
   }
 }
